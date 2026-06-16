@@ -15,6 +15,12 @@ function isEnterKey(event: KeyboardEvent): boolean {
     || event.keyCode === 13
 }
 
+function isTabKey(event: KeyboardEvent): boolean {
+  return event.key === 'Tab'
+    || event.code === 'Tab'
+    || event.keyCode === 9
+}
+
 export function shouldStopComposingEnterKey(
   event: KeyboardEvent,
   view?: ComposingEditorView | null,
@@ -22,11 +28,18 @@ export function shouldStopComposingEnterKey(
   return isEnterKey(event) && isComposingKeyEvent(event, view)
 }
 
+export function shouldStopComposingStructuralKey(
+  event: KeyboardEvent,
+  view?: ComposingEditorView | null,
+): boolean {
+  return (isEnterKey(event) || isTabKey(event)) && isComposingKeyEvent(event, view)
+}
+
 export const createImeCompositionKeyGuardExtension = createExtension(({ editor }) => {
   const readView = () => editor._tiptapEditor?.view ?? editor.prosemirrorView
 
   const handleKeyDown = (event: KeyboardEvent) => {
-    if (!shouldStopComposingEnterKey(event, readView())) return
+    if (!shouldStopComposingStructuralKey(event, readView())) return
 
     event.stopImmediatePropagation()
   }

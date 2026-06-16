@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest'
 import {
   createImeCompositionKeyGuardExtension,
   shouldStopComposingEnterKey,
+  shouldStopComposingStructuralKey,
 } from './imeCompositionKeyGuardExtension'
 
 type KeyListener = (event: KeyboardEvent) => void
@@ -88,6 +89,65 @@ describe('shouldStopComposingEnterKey', () => {
   })
 })
 
+describe('shouldStopComposingStructuralKey', () => {
+  it('matches composing Enter', () => {
+    const event = createKeyboardEvent({ isComposing: true })
+
+    expect(shouldStopComposingStructuralKey(event, { composing: false })).toBe(true)
+  })
+
+  it('matches Tab while the native event is composing', () => {
+    const event = createKeyboardEvent({
+      code: 'Tab',
+      isComposing: true,
+      key: 'Tab',
+      keyCode: 9,
+    })
+
+    expect(shouldStopComposingStructuralKey(event, { composing: false })).toBe(true)
+  })
+
+  it('matches Shift+Tab while the native event is composing', () => {
+    const event = createKeyboardEvent({
+      code: 'Tab',
+      isComposing: true,
+      key: 'Tab',
+      keyCode: 9,
+      shiftKey: true,
+    })
+
+    expect(shouldStopComposingStructuralKey(event, { composing: false })).toBe(true)
+  })
+
+  it('matches Tab while the ProseMirror view is still composing', () => {
+    const event = createKeyboardEvent({
+      code: 'Tab',
+      isComposing: false,
+      key: 'Tab',
+      keyCode: 9,
+    })
+
+    expect(shouldStopComposingStructuralKey(event, { composing: true })).toBe(true)
+  })
+
+  it('leaves normal Tab available for list indentation', () => {
+    const event = createKeyboardEvent({
+      code: 'Tab',
+      isComposing: false,
+      key: 'Tab',
+      keyCode: 9,
+    })
+
+    expect(shouldStopComposingStructuralKey(event, { composing: false })).toBe(false)
+  })
+
+  it('leaves non-structural composition keys alone', () => {
+    const event = createKeyboardEvent({ isComposing: true, key: 'a', keyCode: 65 })
+
+    expect(shouldStopComposingStructuralKey(event, { composing: false })).toBe(false)
+  })
+})
+
 describe('createImeCompositionKeyGuardExtension', () => {
   it('registers a capture keydown listener when the editor mounts', () => {
     const fixture = createFixture()
@@ -125,11 +185,57 @@ describe('createImeCompositionKeyGuardExtension', () => {
     expect(event.preventDefault).not.toHaveBeenCalled()
   })
 
+  it('stops composing Tab before BlockNote list shortcuts can indent the item', () => {
+    const fixture = createFixture()
+    fixture.mount()
+
+    const event = fixture.fireKeydown({
+      code: 'Tab',
+      isComposing: true,
+      key: 'Tab',
+      keyCode: 9,
+    })
+
+    expect(event.stopImmediatePropagation).toHaveBeenCalledTimes(1)
+    expect(event.preventDefault).not.toHaveBeenCalled()
+  })
+
+  it('guards Tab while ProseMirror still reports composition', () => {
+    const fixture = createFixture()
+    fixture.view.composing = true
+    fixture.mount()
+
+    const event = fixture.fireKeydown({
+      code: 'Tab',
+      isComposing: false,
+      key: 'Tab',
+      keyCode: 9,
+    })
+
+    expect(event.stopImmediatePropagation).toHaveBeenCalledTimes(1)
+    expect(event.preventDefault).not.toHaveBeenCalled()
+  })
+
   it('does not intercept normal Enter outside IME composition', () => {
     const fixture = createFixture()
     fixture.mount()
 
     const event = fixture.fireKeydown()
+
+    expect(event.stopImmediatePropagation).not.toHaveBeenCalled()
+    expect(event.preventDefault).not.toHaveBeenCalled()
+  })
+
+  it('does not intercept normal Tab outside IME composition', () => {
+    const fixture = createFixture()
+    fixture.mount()
+
+    const event = fixture.fireKeydown({
+      code: 'Tab',
+      isComposing: false,
+      key: 'Tab',
+      keyCode: 9,
+    })
 
     expect(event.stopImmediatePropagation).not.toHaveBeenCalled()
     expect(event.preventDefault).not.toHaveBeenCalled()
