@@ -1,0 +1,32 @@
+src/components/imeCompositionKeyGuardExtension.ts
+  s_c0e66c8a699699::t_478a33cdece92a 326
+  s_c0e66c8a699699::t_b999a3d5d50e73 12
+  s_c0e66c8a699699::t_59616b2b7e8c33 313
+  s_c0e66c8a699699::t_18c383c3837c20 257,282
+  s_c0e66c8a699699::t_65256505a7c990 13-40,58-195,203,229,232-235,237,240,258-266,286-293,341,348,356,360,364,368
+  s_c0e66c8a699699::t_8cb47a43df42f8 5
+  s_c0e66c8a699699::t_3f4837f737f663 236
+  s_c0e66c8a699699::t_4451f5c601fdde 3-4,6,198-199,206-209,221,226-227,230-231,238-239,241-256,267-270,273-275,277-281,283-285,297-307,314-325,327-339
+src/components/imeCompositionKeyGuardExtension.test.ts
+  s_c0e66c8a699699::t_8a6a373df98203 1,8,18,26-46,48-109,111-112,121-133,137-145,147-151,155-162,171-174,177-178,183-186,273,278-282,284-310,334-346
+tests/smoke/korean-list-ime-composition.spec.ts
+  s_c0e66c8a699699::t_79a5d3a16179f9 71,120-179
+  s_c0e66c8a699699::t_458597135fde13 21,23-24,27-37
+  s_c0e66c8a699699::t_8689ae583eb992 229-316
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.9",
+  "base_commit_sha": "13c96771b0cad8d5482deed71a8780744c4454af",
+  "prompts": {},
+  "sessions": {
+    "s_c0e66c8a699699": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ee385c55-099d-4ff8-83e8-aec0ded14e58",
+        "model": "cf-gpt-5.5"
+      },
+      "human_author": "guotong.gt <guotong.gt@bytedance.com>"
+    }
+  }
+}
